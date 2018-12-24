@@ -56,13 +56,13 @@ client_deploy() {
 
 client_log() {
     if [ ! -z "${target}" ]; then
-        deploy/${target} log
+       bash deploy/${target} log
     fi
 }
 
 client_console() {
     if [ ! -z "${target}" ]; then
-        deploy/${target} console
+       bash deploy/${target} console
     fi
 }
 
