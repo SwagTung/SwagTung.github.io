@@ -2,15 +2,15 @@
 <rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>
 <channel>
 <title>SwagTung</title>
-<link>https://minimal-default.netlify.com </link>
+<link>https://swagtung.github.io</link>
 <description>Detailed description for search engines.</description>
 <pubDate>Mon, 24 Dec 2018 18:00:00 +0000</pubDate>
 <lastBuildDate>Mon, 24 Dec 2018 18:00:00 +0000</lastBuildDate>
-<atom:link href='https://minimal-default.netlify.com /blog/feed.rss' rel='self' type='application/rss+xml' />
+<atom:link href='https://swagtung.github.io/blog/feed.rss' rel='self' type='application/rss+xml' />
 <item>
 <title>Welcome</title>
-<link>https://minimal-default.netlify.com /blog/2018-12-25-welcome/</link>
-<guid>https://minimal-default.netlify.com /blog/2018-12-25-welcome/</guid>
+<link>https://swagtung.github.io/blog/2018-12-25-welcome/</link>
+<guid>https://swagtung.github.io/blog/2018-12-25-welcome/</guid>
 <pubDate>Mon, 24 Dec 2018 18:00:00 +0000</pubDate>
 <description>
 
