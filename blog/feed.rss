@@ -1,12 +1,45 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>
 <channel>
-<title>SwagTung</title>
+<title>Swag Tung</title>
 <link>https://swagtung.github.io</link>
 <description>I&#39;m Thanh Tunggggg. I create swag, funny and AI apps.</description>
-<pubDate>Mon, 24 Dec 2018 18:00:00 +0000</pubDate>
-<lastBuildDate>Mon, 24 Dec 2018 18:00:00 +0000</lastBuildDate>
+<pubDate>Wed, 26 Dec 2018 15:00:00 +0000</pubDate>
+<lastBuildDate>Wed, 26 Dec 2018 15:00:00 +0000</lastBuildDate>
 <atom:link href='https://swagtung.github.io/blog/feed.rss' rel='self' type='application/rss+xml' />
+<item>
+<title>Capsule Networks</title>
+<link>https://swagtung.github.io/blog/2018-12-26-capsule-networks/</link>
+<guid>https://swagtung.github.io/blog/2018-12-26-capsule-networks/</guid>
+<pubDate>Wed, 26 Dec 2018 15:00:00 +0000</pubDate>
+<description>
+&lt;p&gt;
+Giới thiệu, tìm hiểu và giải thích về ý tưởng đằng sau mạng Capsule.
+&lt;&#x2F;p&gt;
+
+&lt;p&gt;
+Source code &lt;a href&#x3D;&#39;https:&#x2F;&#x2F;github.com&#x2F;ThanhTunggggg&#x2F;Capsnet&#39;&gt;here&lt;&#x2F;a&gt;
+&lt;&#x2F;p&gt;
+
+&lt;!DOCTYPE HTML PUBLIC &quot;-&#x2F;&#x2F;W3C&#x2F;&#x2F;DTD HTML 4.0 Transitional&#x2F;&#x2F;EN&quot;&gt;
+&lt;HTML&gt;
+&lt;HEAD&gt;
+	&lt;META HTTP-EQUIV&#x3D;&quot;CONTENT-TYPE&quot; CONTENT&#x3D;&quot;text&#x2F;html; charset&#x3D;utf-8&quot;&gt;
+	&lt;TITLE&gt;&lt;&#x2F;TITLE&gt;
+	&lt;META NAME&#x3D;&quot;GENERATOR&quot; CONTENT&#x3D;&quot;LibreOffice 4.1.6.2 (Linux)&quot;&gt;
+	&lt;META NAME&#x3D;&quot;AUTHOR&quot; CONTENT&#x3D;&quot;Hoang Thanh Tung&quot;&gt;
+	&lt;META NAME&#x3D;&quot;CREATED&quot; CONTENT&#x3D;&quot;20180604;191500000000000&quot;&gt;
+	&lt;META NAME&#x3D;&quot;CHANGEDBY&quot; CONTENT&#x3D;&quot;Thanh Tung&quot;&gt;
+	&lt;META NAME&#x3D;&quot;CHANGED&quot; CONTENT&#x3D;&quot;20181226;184100000000000&quot;&gt;
+	&lt;META NAME&#x3D;&quot;AppVersion&quot; CONTENT&#x3D;&quot;15.0000&quot;&gt;
+	&lt;META NAME&#x3D;&quot;DocSecurity&quot; CONTENT&#x3D;&quot;0&quot;&gt;
+	&lt;META NAME&#x3D;&quot;HyperlinksChanged&quot; CONTENT&#x3D;&quot;false&quot;&gt;
+	&lt;META NAME&#x3D;&quot;LinksUpToDate&quot; CONTENT&#x3D;&quot;false&quot;&gt;
+	&lt;META NAME&#x3D;&quot;ScaleCrop&quot; CONTENT&#x3D;&quot;false&quot;&gt;
+	&lt;META NAME&#x3D;&quot;ShareDoc&quot; CONTENT&#x3D;&quot;false&quot;&gt;
+	&lt;&#x2F;head&gt;&lt;&#x2F;html&gt;
+</description>
+</item>
 <item>
 <title>Welcome</title>
 <link>https://swagtung.github.io/blog/2018-12-25-welcome/</link>
@@ -29,8 +62,6 @@ Clone repo:
 <guid>https://swagtung.github.io/blog/2013-02-23-wealth-of-tech-companies/</guid>
 <pubDate>Mon, 25 Feb 2013 02:00:00 +0000</pubDate>
 <description>
-
-&lt;p&gt;Inspired by Hans Rosling&#39;s &lt;a href&#x3D;&#39;https:&#x2F;&#x2F;www.ted.com&#x2F;talks&#x2F;hans_rosling_reveals_new_insights_on_poverty&#39;&gt;TED&lt;&#x2F;a&gt; talk, this D3.js motion chart shows net income, revenue and market cap of some large tech companies over time.&lt;&#x2F;p&gt;
 
 
 </description>

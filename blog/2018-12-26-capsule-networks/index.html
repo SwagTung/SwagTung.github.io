@@ -1,0 +1,851 @@
+<html>
+<head>
+<title>Capsule Networks</title>
+<meta http-equiv='content-type' content='text/html; charset=utf-8' />
+<meta name='robots' content='noodp' />
+<meta name='viewport' content='width=device-width, initial-scale=1' />
+<script type='text/javascript'></script>
+<link rel='alternate' type='application/atom+xml' title='Swag Tung' href='https://swagtung.github.io/blog/feed.atom' />
+<link rel='alternate' type='application/rss+xml' title='Swag Tung' href='https://swagtung.github.io/blog/feed.rss' />
+
+<style type='text/css'>
+html {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; "Helvetica Neue", sans-serif;
+}
+body { max-width: 980px !important; margin: 80px auto 80px auto; padding: 0 50px 0 50px; background-color: #fff; }
+.post { box-sizing: border-box; }
+.header { display: block; font-size: 14px; background-color: #f6f8fa; line-height: 20px; border: 1px solid rgba(27, 31, 35, 0.15); border-radius: 3px 3px 0 0; padding: 10px; margin-bottom: -1px; }
+.header .image { display: inline-block !important; text-decoration: none; }
+.header .image .portrait { display: inline-block; border-radius: 2px; width: 20px; height: 20px; vertical-align: middle; margin-top: -2px; }
+.header .author { font-weight: 600; color: #24292e; text-decoration: none; }
+.header .author:hover { text-decoration: underline; }
+.header .date { float: right; font-size: 13px; color: #586069; }
+.article { padding: 45px; border: 1px solid #ddd; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; border-top: 0px; }
+.post h1 { font-weight: 600; font-size: 2.0em; line-height: 1.25; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 0px; margin-bottom: 16px; }
+.post h2 { font-weight: 600; font-size: 1.5em; line-height: 1.25; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 24px; margin-bottom: 16px; }
+.post h3 { font-weight: 600; font-size: 1.25em; line-height: 1.25; padding-bottom: 0.3em; margin-top: 24px; margin-bottom: 16px; }
+.post .content { font-size: 16px; line-height: 1.5; word-break: break-word; word-wrap: break-word; }
+.post .content p { margin: 10px 0 16px 0; }
+.post .content a, .post p a:visited, .post p a:link, .post p a:active { color: #0366d6; text-decoration: underline; }
+.post .content code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 85%; background-color: rgba(27, 31, 35, 0.05); padding: 0.2em 0 0.2em 0; border-radius: 3px; content: "\00a0" }
+.post .content code::before { letter-spacing: -0.2em; content: "\00a0" }
+.post .content code::after { letter-spacing: -0.2em; content: "\00a0" }
+.post .content pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 86%; line-height: 1.45; background-color: #f6f8fa; color: #333333; padding: 16px; border-radius: 3px; overflow: auto; word-break: normal; word-wrap: normal; margin: 16px 0 16px 0; }
+@media all and (max-width: 767px) {
+body { max-width: 100%; margin: 0 auto 0 auto; padding: 0; background-color: #fafbfc; }
+.header { background-color: #fafbfc; border-top: 0; border-left: 0; border-right: 0; border-radius: 0; padding: 10px 15px 10px 15px; }
+.article { padding: 15px; border: 0px; }
+.post .content { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+<div class='post'>
+<div class='header'>
+  <a class='image' href='/'><img class='portrait' src='/portrait.jpg' /></a>
+  <a class='author' href='/'>Swag Tung</a><span class='date'>Dec 26, 2018</span>
+</div>
+<article class='article'>
+  <h1>Capsule Networks</h1>
+  <div class='content'>
+  <p>
+Giới thiệu, tìm hiểu và giải thích về ý tưởng đằng sau mạng Capsule.
+</p>
+
+<p>
+Source code <a href='https://github.com/ThanhTunggggg/Capsnet'>here</a>
+</p>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="LibreOffice 4.1.6.2 (Linux)">
+	<META NAME="AUTHOR" CONTENT="Hoang Thanh Tung">
+	<META NAME="CREATED" CONTENT="20180604;191500000000000">
+	<META NAME="CHANGEDBY" CONTENT="Thanh Tung">
+	<META NAME="CHANGED" CONTENT="20181226;184100000000000">
+	<META NAME="AppVersion" CONTENT="15.0000">
+	<META NAME="DocSecurity" CONTENT="0">
+	<META NAME="HyperlinksChanged" CONTENT="false">
+	<META NAME="LinksUpToDate" CONTENT="false">
+	<META NAME="ScaleCrop" CONTENT="false">
+	<META NAME="ShareDoc" CONTENT="false">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin-left: 1.48in; margin-right: 0.79in; margin-top: 0.49in; margin-bottom: 1in }
+		P { margin-left: 0.59in; margin-bottom: 0in; direction: ltr; line-height: 100%; text-align: left; widows: 0; orphans: 0 }
+		P.western { font-family: "Times New Roman", serif; font-size: 13pt; so-language: en-US }
+		P.cjk { font-family: "Times New Roman"; font-size: 13pt }
+		P.ctl { font-family: ; font-size: 13pt }
+		H1 { margin-bottom: 0in; direction: ltr; color: #000000; line-height: 150%; text-align: center; page-break-inside: avoid; widows: 2; orphans: 2 }
+		H1.western { font-family: "Calibri Light", serif; font-size: 16pt; so-language: en-US }
+		H1.cjk { font-family: "Times New Roman"; font-size: 16pt }
+		H1.ctl { font-family: ; font-size: 16pt; font-weight: normal }
+		H2 { margin-top: 0.03in; margin-bottom: 0in; direction: ltr; color: #000000; line-height: 150%; text-align: justify; page-break-inside: avoid; widows: 2; orphans: 2 }
+		H2.western { font-family: "Calibri Light", serif; font-size: 14pt; so-language: en-US }
+		H2.cjk { font-family: "Times New Roman"; font-size: 14pt }
+		H2.ctl { font-family: ; font-size: 13pt; font-weight: normal }
+		A:link { color: #0563c1; so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="vi-VN" LINK="#0563c1" DIR="LTR">
+<DIV TYPE=HEADER>
+	<P LANG="en-US" ALIGN=RIGHT STYLE="margin-left: 0in; margin-bottom: 0.47in; line-height: 150%; widows: 2; orphans: 2">
+	<BR>
+	</P>
+</DIV>
+<OL>
+	<LI><H1 LANG="en-US" CLASS="western" ALIGN=LEFT><A NAME="_Toc516827108"></A><SPAN LANG="de-DE">Mạng CNN </SPAN>	</H1>
+</OL>
+<OL>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827109"></A>Đặc
+	điểm mạng CNN</H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Mạng CNN(Convolutional Neural
+Networks) hay mạng nơ-ron tích chập mạng nơ-ron xếp chồng
+nhiều lớp, mỗi lớp gồm các toán tử tích chập
+(Convolution), giảm mẫu (Subsampling) và phi tuyến
+(Nonlinearly).</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_51f60f23.png" NAME="Picture 2" ALIGN=BOTTOM WIDTH=434 HEIGHT=200 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829135"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 1: Mạng CNN.</I></FONT></FONT></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE">Lớp</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><B>
+	</B></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><I><B>Convolution</B></I></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">:
+	Lọc thông tin không quan trọng và trích chọn đặc trưng
+	cục bộ nổi bật  bằng cách sử dụng các Kernel được
+	huấn luyện.</SPAN></FONT></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE">Lớp </SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><I><B>Subsampling</B></I></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">
+	hay </SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><I><B>Pooling</B></I></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">:
+	Gộp lại (pool) những đầu ra có cùng loại gần nhau của
+	lớp Convolution.</SPAN></FONT></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE"><I><B>Nonlinearly</B></I></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">:
+	Tăng khả năng mô hình hóa mối quan hệ đầu vào-đầu
+	ra phức tạp.</SPAN></FONT></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">CNN có các đặc điểm phù hợp
+cho phân tích, hiểu dữ liệu ảnh:</SPAN></FONT></P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="line-height: 100%; widows: 2; orphans: 2">
+	<FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">CNN
+	sử dụng nhiều lớp của những bộ phát hiện đặc
+	trưng được học (là các </SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN"><I><B>kernel</B></I></SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">
+	chạy qua không gian ma trận của ảnh)</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="de-DE">.</SPAN></FONT></FONT></FONT></P>
+	<LI><P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="line-height: 100%; widows: 2; orphans: 2">
+	<FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">Các
+	bộ phát hiện đặc trưng có</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="de-DE">
+	</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">tính
+	cục bộ,  mỗi loại  tính toán trên lần lượt các vùng
+	trong ảnh</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="de-DE">.</SPAN></FONT></FONT></FONT></P>
+	<LI><P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="line-height: 100%; widows: 2; orphans: 2">
+	<FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">Phạm
+	vi không gian lớn hơn ở các lớp sâu hơn  hay các thông 
+	tin mức cao sẽ ở lớp cao hơn</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="de-DE">.</SPAN></FONT></FONT></FONT></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0.64in; text-indent: -0.25in; margin-bottom: 0.17in; line-height: 100%; widows: 2; orphans: 2">
+<FONT COLOR="#ff0000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">x	</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="vi-VN">Các
+lớp trích xuất đặc trưng được xen kẽ với các lớp
+giảm mẫu, gộp lại (pool) những đầu ra  của các bộ
+phát hiện đặc trưng cùng loại gần nhau</SPAN></FONT></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Calibri Light, serif"><FONT SIZE=4><SPAN LANG="de-DE">.</SPAN></FONT></FONT></FONT></P>
+<OL START=2>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827110"></A>Ý
+	nghĩa của lớp Pooling</H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Ưu điểm của lớp Pooling:</SPAN></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Giảm số lượng đầu vào cho lớp trích
+	chọn đặc trưng tiếp theo (giảm kích thước của
+	</SPAN><SPAN LANG="de-DE"><I><B>activation maps</B></I></SPAN><SPAN LANG="de-DE">).
+	Từ đó cho phép có nhiều loại đặc trưng (kernel) trong
+	lớp tiếp theo và thêm nhiều lớp hơn, do việc giảm chi
+	phí tính toán</SPAN></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Cho một lượng nhỏ khả năng bất biến
+	tịnh tiến tại mỗi lớp. Do yêu cầu thực tế là nhãn
+	cuối cùng cần bất biến điểm nhìn (</SPAN><SPAN LANG="de-DE"><I><B>viewpoint-invariant</B></I></SPAN><SPAN LANG="de-DE">).
+	Vị trí chính xác của hầu hết các đặc trưng kích
+	hoạt được bỏ qua.</SPAN></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_3341a682.png" NAME="Picture 4" ALIGN=BOTTOM WIDTH=294 HEIGHT=237 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829136"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 2: Đầu ra của
+Max-pooling khi đối tượng tịnh tiến khoảng nhỏ.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Nếu một thực thể trong ảnh bị dịch
+đi một lượng nhỏ, activation map tương ứng với thực
+thể đó sẽ dịch chuyển tương đương. Tuy nhiên, đầu
+ra của lớp Pooling (vd: Max-Pooling) của activation map vẫn
+không bị thay đổi.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Nếu không có lớp Pooling, CNN sẽ chỉ fit
+những ảnh rất giống với ảnh trong tập huấn luyện.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Tuy nhiên, </SPAN><SPAN LANG="de-DE"><I>“Cách
+điểu diễn dữ liệu nội bộ của mạng CNN không tính
+đến các phân cấp không gian quan trọng giữa các đối
+tượng đơn giản và phức tạp“. </I></SPAN><SPAN LANG="de-DE">Điều
+này có nghĩa mạng CNN sẽ mất đi các quan hệ không gian
+giữa các phần của đối tượng. Xem ví dụ dưới đây,
+mạng CNN vẫn dự đoán 2 này ảnh có chứa người, điều
+này là không đúng.</SPAN></P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_ab821a00.png" NAME="Picture 10" ALIGN=BOTTOM WIDTH=368 HEIGHT=260 BORDER=0></P>
+<P LANG="de-DE" ALIGN=LEFT STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829137"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>		Hình 3: Hình ảnh đánh
+lừa mạng CNN.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="vi-VN">Subsampling làm mất đi các quan
+hệ không gian chính xác giữa các bộ phận của khuôn mặt
+như mũi và miệng. Các quan hệ không gian là cần thiết
+cho nhận dạng đặc tính. Việc chồng chéo các nhóm
+Subsampling có thể giảm thiểu điều này.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="vi-VN">CNN không thể ngoại suy từ
+hiểu biết về quan hệ không gian với điểm nhìn hoàn
+toàn mới.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_e6554ba.png" NAME="Picture 11" ALIGN=BOTTOM WIDTH=410 HEIGHT=196 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829138"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 4: Các đối tượng ở
+các góc nhìn khác nhau.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; margin-bottom: 0.17in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Mạng CNN không có khả năng dự
+đoán được đối tượng khi đối tượng ở góc nhìn
+hoàn toàn khác so với hình ảnh đối tượng trong tập
+huấn luyện. Trong ví dụ hình ảnh trên mạng CNN suy ra
+được đối tượng dưới khi nó được học đối tượng
+phía trên.</SPAN></FONT></P>
+<OL START=2>
+	<LI><H1 LANG="en-US" CLASS="western" ALIGN=LEFT><A NAME="_Toc516827111"></A>
+	<SPAN LANG="de-DE">Capsule network</SPAN></H1>
+</OL>
+<OL>
+	<LI><P LANG="de-DE" ALIGN=LEFT STYLE="display: none; line-height: 150%; page-break-inside: avoid; widows: 2; orphans: 2; page-break-after: avoid">
+	</P>
+</OL>
+<OL>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827112"></A>Bất
+	biến và đẳng biến</H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Hai khái niệm quan trọng nhưng
+dễ nhầm lẫn khi nói về mạng CNN nói chung, thị giác
+máy tính nói chung. Nhìn chung chúng được hiểu như sau:</SPAN></FONT></P>
+<UL>
+	<LI><P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE">M</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">ột
+	toán tử là bất biến</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><B>
+	(invariant</B></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">)</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">
+	đối với một </SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">phép
+	</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">biến đổi khi </SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">ảnh
+	hưởng </SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">của phép
+	</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">b</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">iến
+	đổi</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"> đó</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">
+	không thể phát hiện được trong đầu ra của toán tử</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">.</SPAN></FONT></P>
+	<LI><P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE">M</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">ột
+	toán tử là </SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">đẳng
+	biến (</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><B>equinvariant</B></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">)</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">
+	</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">đối với một
+	</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">phép biến </SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">đổi
+	khi </SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">ảnh hưởng </SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">của
+	</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">phép biến </SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">đổi</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">
+	đó</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN"> có thể phát
+	hiện được trong đầu ra của toán tử</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">.</SPAN></FONT></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Subsampling có gắng làm cho các
+neural activities bất biến với những thay đổi nhỏ trong
+điểm nhìn. Đây là mục tiêu sai, do nhu cầu thực tế là
+nhãn cuối cùng cần được bất biến mọi điểm nhìn.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Hướng đi tốt hơn của mạng
+là nhắm tới equivariance. Những thay đổi trong điểm nhìn
+sẽ dẫn tới  thay đổi tương ứng trong những neural
+activities. Trong hệ thống tri giác, trọng số của nó mã
+hóa tri thức bất biến điểm nhìn (viewpoint-invariant
+knowledge), chứ không phải là neural activities.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_6506ce54.png" NAME="Picture 13" ALIGN=BOTTOM WIDTH=346 HEIGHT=209 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829139"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 5: Một khả năng mà
+mạng CNN không có.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Có 2 loại đẳng biến:</SPAN></FONT></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	‘<FONT SIZE=4><SPAN LANG="de-DE"><I><B>Place-coded’
+	equivariance</B></I></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">:
+	Nếu một phần cấp thấp di chuyển đến một vị trí
+	rất khác, nó sẽ được biểu diễn bởi một capsule
+	khác.</SPAN></FONT></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	‘<FONT SIZE=4><SPAN LANG="de-DE"><I><B>Rate-coded’ equivariance</B></I></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">:
+	Nếu một phần chỉ di chuyển một khoảng cách nhỏ, nó
+	sẽ được biểu diễn bởi cùng một capsule nhưng tư thế
+	(pose) đầu ra của capsule sẽ thay đổi.</SPAN></FONT></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Các capsule cấp cao hơn có các
+phạm vi lớn hơn (đại điện vùng cho ảnh lớn hơn), do
+đó ‘place-coded’ equivariance mức độ thấp được
+chuyển đổi thành ‘rate-coded’ equivariance mức cao.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Không có lớp pooling, mạng CNN
+có khả năng «place-coded» equivariance với phép tịnh tiến.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_50754363.png" NAME="Picture 20" ALIGN=BOTTOM WIDTH=368 HEIGHT=176 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829140"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 6: Mạng CNN đẳng
+biến với phép tịnh tiến.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Để đạt được bất biến,
+mạng neural hiện tại huấn luyện các mẫu dữ liệu với
+các điểm nhìn khác nhau. Điều này yêu cầu rất nhiều
+dữ liệu.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_c280113e.png" NAME="Picture 21" ALIGN=BOTTOM WIDTH=446 HEIGHT=153 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829141"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 7: Các góc độ khác
+nhau của mặt người.</I></FONT></FONT></P>
+<OL START=2>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827113"></A>Inverse
+	Graphis</H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; margin-bottom: 0.17in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="vi-VN">Để hiển thị một đối tượng
+dạng lưới (3D) thành các điểm ảnh trên màn hình, nó
+lấy tư thế (</SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN"><B>pose</B></SPAN></FONT><FONT SIZE=4><SPAN LANG="vi-VN">)
+của đối tượng và nhân nó với ma trận chuyển đổi.
+Điều này tạo ra tư thế của một phần của đối tượng
+trong một chiều thấp hơn (2D), đó là những gì thấy
+trên màn hình. </SPAN></FONT>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_5baadfc5.png" NAME="Picture 23" ALIGN=BOTTOM WIDTH=487 HEIGHT=106 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829142"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 8: <SPAN LANG="en-US">Computer
+graphics.</SPAN> </I></FONT></FONT>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Vì vậy, các cấp cao hơn của
+một hệ thống thị giác sẽ trông giống như các biểu
+diễn được sử dụng trong đồ họa.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Các chương trình đồ họa sử
+dụng các mô hình phân cấp trong đó cấu trúc không gian
+được mô hình hóa bằng các ma trận (trọng số), đại
+diện cho mối quan hệ giữa đối tượng nói chung và tư
+thế của bộ phận. Những ma trận này hoàn toàn là bất
+biến-điểm nhìn.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Tuy nhiều tư thế của các bộ
+phần đã thay đổi, chúng ta có thể lấy lại tư thế
+của toàn bộ bằng cách sử dụng cùng một ma trận trọng
+số.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_94fe7375.png" NAME="Picture 84" ALIGN=BOTTOM WIDTH=458 HEIGHT=115 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829143"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 9: Inverse graphics.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Điều này là độc lập hoàn
+toàn (và bất biến dịch) giữa các điểm nhìn của đối
+tượng trong một ma trận trọng số, không phải trong
+neural activity (equivariance).</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Một ví dụ thực tế về
+Computer graphics và Inverse graphics.</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_66bf9265.png" NAME="Picture 85" ALIGN=BOTTOM WIDTH=434 HEIGHT=137 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829144"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 10: Ví dụ về
+computer graphics.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_dfee817e.png" NAME="Picture 86" ALIGN=BOTTOM WIDTH=418 HEIGHT=126 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829145"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 11: Ví dụ về inverse
+graphis.</I></FONT></FONT></P>
+<OL START=3>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827114"></A>Inverse
+	graphis cho đẳng biến: ưu điểm và các tiến hành</H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Lấy ý tưởng tính chất đẳng biến của
+inverse graphis cho bài toán thị giác máy tính. Một mô hình
+dễ dàng hiểu thứ nó thấy chỉ là một cái nhìn khác
+về cái mà nó đã thấy trước đây. Bằng cách này, mô
+hình có thể học mà chỉ cần sử dụng một phần nhỏ
+dữ liệu mà CNN sẽ sử dụng.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Để mô tả cách lấy ý tưởng của
+Inverse graphis cho nhận dạng đối tượng gồm nhiều bộ
+phận (ví dụ: mặt có mũi, miệng...) xem hình ảnh dưới,
+hai lớp trong phân cấp của các bộ phận.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_28535ae6.png" NAME="Picture 87" ALIGN=BOTTOM WIDTH=312 HEIGHT=175 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829146"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 12: Phân cấp capsule.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Thực thể cấp cao hơn sẽ có
+mặt nếu một số thực thể cấp thấp hơn có thể thống
+nhất về dự đoán (</SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE"><B>vote</B></SPAN></FONT><FONT SIZE=4><SPAN LANG="de-DE">)
+của chúng cho tư thế của nó (thực thể cấp cao).</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Trong đó:</SPAN></FONT></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4>T</FONT><SUB><FONT SIZE=4>h</FONT></SUB><FONT SIZE=4><SPAN LANG="de-DE">:
+	tư thế của mũi.</SPAN></FONT></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE">p</SPAN></FONT><SUB><FONT SIZE=4><SPAN LANG="de-DE">h</SPAN></FONT></SUB><FONT SIZE=4><SPAN LANG="de-DE">:
+	xác suất mũi có mặt.</SPAN></FONT></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<FONT SIZE=4><SPAN LANG="de-DE">T</SPAN></FONT><SUB><FONT SIZE=4><SPAN LANG="de-DE">hj</SPAN></FONT></SUB><FONT SIZE=4><SPAN LANG="de-DE">,
+	… : bất biến điểm nhìn.</SPAN></FONT></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<FONT SIZE=4><SPAN LANG="de-DE">Chính là những gì Capsules hoạt
+động!!!</SPAN></FONT></P>
+<OL START=4>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827115"></A><SPAN LANG="de-DE">Capsule</SPAN></H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Trích Transforming  Autoencoders paper:</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE"><I>Instead of aiming for viewpoint invariance in
+the activities of “neurons” that use a single scalar output to 
+summarize the activities of a local pool of replicated feature
+detectors, artificial neural networks should use  local “capsules”.</I></SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Nhóm các neuron thực hiện rất nhiều tính
+toán nội bộ và sau đó đóng gói các kết quả của các
+tính toán này thành một vectơ nhỏ, được lấy cảm hứng
+từ mini-column trong não bộ.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Mỗi capsule học cách nhận ra một thực
+thể thị giác được định nghĩa ngầm trên một miền
+giới hạn các điều kiện quan sát và biến dạng.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Một capsule xuất ra 2 thông tin(được
+nhúng trong vectơ):</SPAN></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Xác suất mà thực thể có mặt trong miền
+	giới hạn của nó.</SPAN></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Một bộ các “instantiation parameter”, tư
+	thế (pose) tổng quát của đối tượng. Nó có thể bao
+	gồm vị trí chính xác, ánh sáng và biến dạng của thực
+	thể so với thực thể nó phù hợp đã được định
+	nghĩa ngầm.</SPAN></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Trong bài báo </SPAN><SPAN LANG="de-DE"><I>Dynamic
+Routing Between Capsules</I></SPAN><SPAN LANG="de-DE">, Capsules mã
+hóa xác suất phát hiện một đặc trưng bằng độ dài
+của vector đầu ra của chúng.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_d13e1a35.png" NAME="Picture 88" ALIGN=BOTTOM WIDTH=467 HEIGHT=165 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829147"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 13: Capsules activations.</I></FONT></FONT></P>
+<OL START=5>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827116"></A><SPAN LANG="de-DE">Capsule
+	đẳng biến</SPAN></H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Capsules mã hóa xác suất phát hiện một
+đặc trưng bằng độ dài của vector đầu ra của chúng.
+Và trạng thái của đặc trưng được phát hiện được
+mã hóa theo hướng mà vectơ đó trỏ đến (&quot;instantiation
+parameters&quot;).</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Vì vậy, khi đặc trưng được phát hiện
+di chuyển xung quanh hình ảnh hoặc trạng thái của nó
+bằng cách nào đó thay đổi, xác suất vẫn giữ nguyên
+(độ dài vectơ không thay đổi), nhưng hướng của nó
+thay đổi.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_f4050ad4.png" NAME="Picture 90" ALIGN=BOTTOM WIDTH=392 HEIGHT=227 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829148"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 14: Capsules đẳng
+biến.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Đây là những gì Hinton đề cập đến về
+activities equivariance: </SPAN><SPAN LANG="de-DE"><I>các neuronal
+activities sẽ thay đổi khi một đối tượng di chuyển
+trên vùng xuất hiện có thể trong hình ảnh. Đồng thời,
+xác suất phát hiện vẫn không đổi, đó là dạng
+equivariance mà chúng ta nên hướng tới, và không phải là
+dạng được thực hiển bởi CNN với max pooling.</I></SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_919d7c4f.png" NAME="Picture 91" ALIGN=BOTTOM WIDTH=346 HEIGHT=232 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829149"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 15: Capsule đẳng biến.</I></FONT></FONT></P>
+<OL START=6>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827117"></A><SPAN LANG="de-DE">Routing
+	by Agreement </SPAN>
+	</H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Capsules được sắp xếp theo các lớp. Cho
+u1, u2, u3 là vectơ đầu ra đến từ capsule của lớp bên
+dưới. Vectơ được gửi tới tất cả các bậc cha mẹ
+(capsule phía trên) có thể có trong mạng Neuron. </SPAN>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_7245718f.png" NAME="Picture 7" ALIGN=BOTTOM WIDTH=384 HEIGHT=106 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829150"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 16: Capsule vs Neuron.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Chúng ta hãy giả định rằng các capsule
+cấp thấp hơn tương ứng phát hiện mắt, miệng và mũi
+và capsule cấp cao hơn phát hiện khuôn mặt.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<IMG SRC="index_html_754a9521.png" NAME="Picture 5" ALIGN=BOTTOM WIDTH=318 HEIGHT=191 BORDER=0></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Sau đó các vectơ cấp thấp được nhân
+với các ma trận trọng số tương ứng W (được học
+trong quá trình training) mã hóa các mối quan hệ không gian
+và quan trọng khác giữa các đặc trưng cấp thấp hơn
+(mắt, miệng và mũi) và tính năng cao hơn (mặt). W thực
+hiện một </SPAN><SPAN LANG="de-DE"><I><B>biến đổi affine</B></I></SPAN><SPAN LANG="de-DE">.
+Chúng ta nhận được vị trí dự đoán của đặc trưng
+cấp cao hơn,<IMG SRC="index_html_a7ebd386.png" NAME="Picture 8" ALIGN=BOTTOM WIDTH=112 HEIGHT=24 BORDER=0></SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">VD: Vị trí khuôn mặt được dự đoán
+theo vị trí mắt được phát hiện.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Nếu 3 dự đoán của các đặc trưng cấp
+thấp hơn này trỏ vào cùng một vị trí và trạng thái
+của khuôn mặt, thì có là một khuôn mặt ở đó.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE"><I><B>Routing by Agreement</B></I></SPAN><SPAN LANG="de-DE">
+tìm sự thống nhất của những dự đoán của các capsule
+cấp thấp để có được pose của capsule cấp cao.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_8d87da8e.png" NAME="Picture 112" ALIGN=BOTTOM WIDTH=523 HEIGHT=348 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829151"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 17: Ý nghĩa của
+Routing by Agreement.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Một trong các thuật toán </SPAN><SPAN LANG="de-DE"><I><B>Routing
+by Agreement</B></I></SPAN><SPAN LANG="de-DE"> được Hinton và
+cộng sự đưa ra là </SPAN><SPAN LANG="de-DE"><B>định tuyến
+động</B></SPAN><SPAN LANG="de-DE"> (</SPAN><SPAN LANG="de-DE"><B>dynamic
+routing).</B></SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_f6950a6e.png" NAME="Picture 113" ALIGN=BOTTOM WIDTH=399 HEIGHT=274 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829152"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 18: Định tuyến động.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Cụ thể, chúng ta tính một tổng có trọng
+số s</SPAN><SUB><SPAN LANG="de-DE">j  </SPAN></SUB><SPAN LANG="de-DE">với
+các trọng số  c</SPAN><SUB><SPAN LANG="de-DE">ij,</SPAN></SUB><SPAN LANG="de-DE">
+là </SPAN><SPAN LANG="de-DE"><B>hệ số coupling</B></SPAN><SPAN LANG="de-DE">
+được train bởi </SPAN><SPAN LANG="de-DE"><B>dynamic routing
+</B></SPAN><SPAN LANG="de-DE">(chi tiết phía dưới):</SPAN></P>
+<P LANG="de-DE" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN DIR="LTR" STYLE="float: left; width: 1.39in; height: 0.48in; border: none; padding: 0in; background: #ffffff">
+	<P LANG="en-US" ALIGN=JUSTIFY STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+	<BR>
+	</P>
+</SPAN><BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Chúng ta áp dụng hàm </SPAN><SPAN LANG="de-DE"><B>squashing</B></SPAN><SPAN LANG="de-DE">
+(phi tuyến) để đưa vector về khoảng từ 0 tới 1(chính
+là xác suất phát hiện đặc trưng như đã nêu).  Nó 
+không  làm  thay  đổi  hướng  vector (</SPAN><SPAN LANG="de-DE"><B>pose</B></SPAN><SPAN LANG="de-DE">):</SPAN><SPAN DIR="LTR" STYLE="float: left; width: 1.95in; height: 0.61in; border: none; padding: 0in; background: #ffffff">
+	<P LANG="en-US" ALIGN=JUSTIFY STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+	<BR>
+	</P>
+</SPAN>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Nó co lại các vector nhỏ thành 0 và các
+vec tơ dài thành các vectơ đơn vị. Do đó khả năng của
+mỗi capsule được xác định trong khoảng từ 0 tới 1.</SPAN></P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN DIR="LTR" STYLE="float: left; width: 2.48in; height: 0.72in; border: none; padding: 0in; background: #ffffff">
+	<P LANG="en-US" ALIGN=JUSTIFY STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+	<BR>
+	</P>
+</SPAN><BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Tính </SPAN><SPAN LANG="de-DE"><I><B>hệ số
+coupling:</B></I></SPAN></P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN DIR="LTR" STYLE="float: left; width: 1.23in; height: 0.47in; border: none; padding: 0in; background: #ffffff">
+	<P LANG="en-US" ALIGN=JUSTIFY STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+	<BR>
+	</P>
+</SPAN>
+<SPAN DIR="LTR" STYLE="float: left; width: 2.23in; height: 0.35in; border: none; padding: 0in; background: #ffffff">
+	<P LANG="en-US" ALIGN=JUSTIFY STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+	<BR>
+	</P>
+</SPAN><BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Mã giả thuật toán </SPAN><SPAN LANG="de-DE"><B>dynamic
+routing:</B></SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_d9b3b48f.png" NAME="Picture 93" ALIGN=BOTTOM WIDTH=450 HEIGHT=147 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829153"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 19: Mã giả định
+tuyến động.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Hoạt động của thuật toán định tuyến
+động.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_6682b56c.png" NAME="Picture 12" ALIGN=BOTTOM WIDTH=505 HEIGHT=237 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829154"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 20: Hoạt động của
+định tuyến động.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE"><B>Lưu ý rằng</B></SPAN><SPAN LANG="de-DE">:
+các trọng số khác của mạng (ví dụ: Wij) vẫn được
+huấn luyến như mạng nơ-ron thông thường bằng thuật
+toán lan truyền ngược, tức là cố định khi đã huấn
+luyện mạng xong. Thuật toán </SPAN><SPAN LANG="de-DE"><I><B>Routing
+by Agreement </B></I></SPAN><SPAN LANG="de-DE">được áp dụng để
+dự đoán capsule cha từ các caspule con thông qua các tính
+các hệ số </SPAN><SPAN LANG="de-DE"><B>c</B></SPAN><SPAN LANG="de-DE">,</SPAN><SPAN LANG="de-DE"><B>
+s</B></SPAN><SPAN LANG="de-DE">, </SPAN><SPAN LANG="de-DE"><B>v </B></SPAN><SPAN LANG="de-DE">và</SPAN><SPAN LANG="de-DE"><B>
+b </B></SPAN><SPAN LANG="de-DE">trong các quá trình training lẫn
+inference.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Tổng hợp so sánh giữa Capsule và Nơ-ron:</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_3a5208.png" NAME="Picture 79" ALIGN=BOTTOM WIDTH=504 HEIGHT=283 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829155"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 21: Capsule vs Neuron.</I></FONT></FONT></P>
+<OL START=7>
+	<LI><H2 LANG="en-US" CLASS="western"><A NAME="_Toc516827118"></A><SPAN LANG="de-DE">Kiến
+	trúc mạng</SPAN></H2>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Kiến trúc mạng cho MNIST</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_10dd10eb.png" NAME="Picture 92" ALIGN=BOTTOM WIDTH=511 HEIGHT=140 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829156"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 22: Kiến trúc mạng
+Capsule cho MNIST.</I></FONT></FONT></P>
+<OL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE"><B>Lớp tích chập thứ nhất</B></SPAN><SPAN LANG="de-DE">:
+	Đây là lớp tích chập thông thường, ảnh đầu vào
+	28x28, 256 kernel 9x9. Đầu ra là 256 bản đồ đặc trưng
+	20x20.</SPAN></P>
+</OL>
+<P LANG="en-US" ALIGN=CENTER STYLE="margin-left: 0in; margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_4b56a53f.png" NAME="Picture 82" ALIGN=BOTTOM WIDTH=336 HEIGHT=186 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829157"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 23: Lớp tích chập
+thứ nhất.</I></FONT></FONT></P>
+<OL START=2>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE"><B>Lớp tích chập thứ 2 hay lớp
+	PrimaryCaps</B></SPAN><SPAN LANG="de-DE">:</SPAN></P>
+</OL>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Một lớp tích chập khác tạo ra 256 bản
+	đồ kích hoạt 6x6.</SPAN></P>
+</UL>
+<P LANG="en-US" ALIGN=CENTER STYLE="margin-left: 0in; margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_24b14835.png" NAME="Picture 83" ALIGN=BOTTOM WIDTH=316 HEIGHT=154 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829158"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 24: Lớp tích chập
+thứ hai.</I></FONT></FONT></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Đầu ra của lớp này (6x6x256) được
+	chuyển thành một bộ 32 bản đồ kích hoạt capsule với
+	mỗi capsule có 8 chiều. Có tổng cộng 6*6*32=1152 capsule
+	(mỗi capsule có 8 chiều).</SPAN></P>
+</UL>
+<P LANG="en-US" ALIGN=CENTER STYLE="margin-left: 0in; margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_818cc003.png" NAME="Picture 89" ALIGN=BOTTOM WIDTH=244 HEIGHT=255 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829159"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 25: PrimaryCaps.</I></FONT></FONT></P>
+<OL START=3>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE"><B>Lớp Capsule-to-capsule hay lớp DigitCaps
+	hay lớp ClassCaps</B></SPAN><SPAN LANG="de-DE"> :</SPAN></P>
+</OL>
+<UL>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">1152 capsule mức thấp (PrimaryCaps) được
+	kết nối với 10 capsule mức cao (DigitCaps hay ClassCaps): Có
+	1152*10 = 11520 ma trận trọng số Wij.</SPAN></P>
+</UL>
+<P LANG="en-US" ALIGN=CENTER STYLE="margin-left: 0in; margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_7a941e0a.png" NAME="Picture 96" ALIGN=BOTTOM WIDTH=244 HEIGHT=266 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829160"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 26: Lớp
+Capsule-to-capsule.</I></FONT></FONT></P>
+<UL>
+	<LI><P LANG="en-US" ALIGN=JUSTIFY STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">10 capsule mức cao (có 16 chiều) biển diễn
+	10  “thực thể số/lớp” cuối cùng.</SPAN></P>
+	<LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.08in; margin-bottom: 0.08in; line-height: 150%; widows: 2; orphans: 2">
+	<SPAN LANG="de-DE">Ở lớp này, các capsule sẽ thực hiện
+	định tuyến động.</SPAN></P>
+</UL>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Cuối cùng, hàm mất mất được sử dụng
+được sử dụng là mất mát lề tách biệt L</SPAN><SUB><SPAN LANG="de-DE">c</SPAN></SUB><SPAN LANG="de-DE">
+(separate margin loss) với mỗi c tương ứng với 1 DigitCap:</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<IMG SRC="index_html_63fb740.png" NAME="Picture 99" ALIGN=BOTTOM WIDTH=382 HEIGHT=17 BORDER=0></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Trong đó, Tc=1 nếu một đối tượng của
+lớp c có mặt, m+=0.9, m−=0.1 và λ=0.5 (trọng số giảm)
+cho lớp vắng.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Hàm mất mát được hiểu như sau: Nếu có
+một đối tượng của lớp c có mặt thì ||v</SPAN><SUB><SPAN LANG="de-DE">c</SPAN></SUB><SPAN LANG="de-DE">||
+không được nhỏ hơn 0,9, nếu không thì ||v</SPAN><SUB><SPAN LANG="de-DE">c</SPAN></SUB><SPAN LANG="de-DE">||
+không được quá 0,1.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Mất mát tổng là tổng mất mát của tất
+cả các DigitCap.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_a0b31e9e.png" NAME="Picture 100" ALIGN=BOTTOM WIDTH=270 HEIGHT=153 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829161"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 27: DigitCaps và hàm
+mất mất.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2"><A NAME="_GoBack"></A>
+<SPAN LANG="de-DE"><B>Ngoài ra</B></SPAN><SPAN LANG="de-DE">, các
+tác giả còn đưa ra 1 phương pháp hiệu chỉnh mạng sử
+dụng </SPAN><SPAN LANG="de-DE"><B>reconstruction </B></SPAN><SPAN LANG="de-DE">lấy
+cảm hứng từ mạng autoencoder. Mạng cho lớp reconstruction
+là mạng MLP đầu vào là DigitCaps tạo ra một đầu ra có
+784=28*28 chiều, ảnh tái tạo.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_c06a5224.png" NAME="Picture 104" ALIGN=BOTTOM WIDTH=411 HEIGHT=213 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829162"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 28: Lớp Reconstruction.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Lúc này, hàm mất mát gồm loss margin và
+reconstruction loss.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_4493ebd8.png" NAME="Picture 102" ALIGN=BOTTOM WIDTH=426 HEIGHT=202 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829163"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 29: Reconstruction.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Ví dụ, ảnh đầu vào là số 3.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_9ac8a8f8.png" NAME="Picture 105" ALIGN=BOTTOM WIDTH=331 HEIGHT=183 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829164"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 30: Ví dụ
+reconstruction.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Tổng kết, kiến trúc mạng đầy đủ với
+</SPAN><SPAN LANG="de-DE"><I><B>reconstruction</B></I></SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_fb01fed0.png" NAME="Picture 80" ALIGN=BOTTOM WIDTH=334 HEIGHT=239 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829165"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 31: Kiến trúc mạng
+đầy đủ.</I></FONT></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; text-indent: 0.39in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">Liệt kê dạng thành dạng bảng.</SPAN></P>
+<P LANG="en-US" CLASS="western" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.11in; line-height: 107%; widows: 2; orphans: 2; page-break-after: avoid">
+<IMG SRC="index_html_7e628f01.png" NAME="Picture 110" ALIGN=BOTTOM WIDTH=422 HEIGHT=282 BORDER=0></P>
+<P LANG="de-DE" ALIGN=CENTER STYLE="margin-left: 0in; margin-bottom: 0.14in; line-height: 150%; widows: 2; orphans: 2; page-break-after: avoid"><A NAME="_Toc516829166"></A>
+<FONT COLOR="#000000"><FONT SIZE=3><I>Hình 32: Kiến trúc mạng
+đầy đủ (bảng).</I></FONT></FONT></P>
+<OL START=3>
+	<LI><H1 LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="page-break-before: always"><A NAME="_Toc516827124"></A>
+	Tài liệu tham khảo</H1>
+</OL>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">[1]	</SPAN><FONT COLOR="#000000"><I><SPAN STYLE="background: #ffffff">Transforming
+auto-encoders</SPAN></I></FONT><FONT COLOR="#000000"><SPAN STYLE="background: #ffffff">,
+Geoffrey Hinton, Alex Krizhevsky and Sida D Wang, 2011</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">[2]	</SPAN><FONT COLOR="#000000"><I><SPAN STYLE="background: #ffffff">Dynamic
+Routing Between Capsules</SPAN></I></FONT><FONT COLOR="#000000"><SPAN STYLE="background: #ffffff">,
+Sara Sabour, Nicholas Frosst and Geoffrey Hinton, Nov 2017</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+[3]	<FONT COLOR="#000000"><I><SPAN STYLE="background: #ffffff">Matrix
+capsules with EM routing</SPAN></I></FONT><FONT COLOR="#000000"><SPAN STYLE="background: #ffffff">,
+Geoffrey Hinton, Sara Sabour and Nicholas Frosst, 2018</SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="fr-FR"><SPAN STYLE="background: #ffffff">[4]	Aurélien
+Géron, Capsule Networks (CapsNets) – Tutorial</SPAN></SPAN></FONT></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">[5]	</SPAN><A HREF="https://hackernoon.com/what-is-a-capsnet-or-capsule-network-2bfbe48769cc"><SPAN LANG="fr-FR"><SPAN STYLE="background: #ffffff">https://hackernoon.com/what-is-a-capsnet-or-capsule-network-2bfbe48769cc</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">[6]	</SPAN><A HREF="https://jhui.github.io/2017/11/03/Dynamic-Routing-Between-Capsules/"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://jhui.github.io/2017/11/03/Dynamic-Routing-Between-Capsules/</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">[7]	</SPAN></SPAN></FONT><A HREF="https://jhui.github.io/2017/11/14/Matrix-Capsules-with-EM-routing-Capsule-Network/"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://jhui.github.io/2017/11/14/Matrix-Capsules-with-EM-routing-Capsule-Network/</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="de-DE">[8]	</SPAN></FONT><A HREF="https://kndrck.co/posts/capsule_networks_explained/"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://kndrck.co/posts/capsule_networks_explained/</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">[9]	</SPAN></SPAN></FONT><A HREF="https://becominghuman.ai/understand-and-apply-capsnet-on-traffic-sign-classification-a592e2d4a4ea"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://becominghuman.ai/understand-and-apply-capsnet-on-traffic-sign-classification-a592e2d4a4ea</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">[10]</SPAN></SPAN></FONT><A HREF="https://aboveintelligent.com/ml-cnn-translation-equivariance-and-invariance-da12e8ab7049"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://aboveintelligent.com/ml-cnn-translation-equivariance-and-invariance-da12e8ab7049</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<SPAN LANG="de-DE">[11]</SPAN><A HREF="https://www.slideshare.net/kyuhwanjung/vuno-dl-seminarcapsnetskyuhwanjung20171109"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://www.slideshare.net/kyuhwanjung/vuno-dl-seminarcapsnetskyuhwanjung20171109</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">[12]</SPAN></SPAN></FONT><A HREF="https://medium.com/ai%C2%B3-theory-practice-business/understanding-hintons-capsule-networks-part-ii-how-capsules-work-153b6ade9f66"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">https://medium.com/ai%C2%B3-theory-practice-business/understanding-hintons-capsule-networks-part-ii-how-capsules-work-153b6ade9f66</SPAN></SPAN></A></P>
+<P LANG="en-US" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<FONT COLOR="#000000"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">[13]</SPAN></SPAN></FONT><A HREF="http://cs231n.github.io/convolutional-networks/"><SPAN LANG="de-DE"><SPAN STYLE="background: #ffffff">http://cs231n.github.io/convolutional-networks/</SPAN></SPAN></A></P>
+<P LANG="de-DE" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0.3in; text-indent: -0.3in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="de-DE" CLASS="western" ALIGN=JUSTIFY STYLE="margin-left: 0in; line-height: 150%; widows: 2; orphans: 2">
+<BR>
+</P>
+<P LANG="en-US" CLASS="western" ALIGN=LEFT STYLE="margin-left: 0in; margin-bottom: 0.11in; line-height: 107%; widows: 2; orphans: 2">
+<BR><BR>
+</P>
+</BODY>
+</HTML>
+  </div>
+</article>
+</div>
+</body>
+</html>
