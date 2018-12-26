@@ -22,4 +22,15 @@ Clone repo:
 &lt;&#x2F;p&gt;</content>
 <link rel='alternate' type='text/html' href='https://swagtung.github.io/blog/2018-12-25-welcome/' title='Welcome' />
 </entry>
+<entry>
+<id>https://swagtung.github.io/blog/2013-02-23-wealth-of-tech-companies/</id>
+<published>2013-02-25T02:00:00Z</published>
+<updated>2017-03-06T05:36:00Z</updated>
+<title type='text'>The Wealth of Tech Companies</title>
+<content type='html'>
+&lt;p&gt;Inspired by Hans Rosling&#39;s &lt;a href&#x3D;&#39;https:&#x2F;&#x2F;www.ted.com&#x2F;talks&#x2F;hans_rosling_reveals_new_insights_on_poverty&#39;&gt;TED&lt;&#x2F;a&gt; talk, this D3.js motion chart shows net income, revenue and market cap of some large tech companies over time.&lt;&#x2F;p&gt;
+
+</content>
+<link rel='alternate' type='text/html' href='https://swagtung.github.io/blog/2013-02-23-wealth-of-tech-companies/' title='The Wealth of Tech Companies' />
+</entry>
 </feed>
